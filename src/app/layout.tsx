@@ -1,25 +1,19 @@
 import type { Metadata } from "next";
-import { Caveat, Noto_Serif_JP, Space_Mono } from "next/font/google";
+import { Pixelify_Sans, VT323 } from "next/font/google";
 import { SiteShell } from "@/components/portfolio/site-shell";
 import { SITE } from "@/lib/site";
 import "./globals.css";
 
-const display = Noto_Serif_JP({
+const display = Pixelify_Sans({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: ["300", "400", "700"],
-});
-
-const mono = Space_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
   weight: ["400", "700"],
 });
 
-const hand = Caveat({
-  variable: "--font-hand",
+const pixel = VT323({
+  variable: "--font-pixel",
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["400"],
 });
 
 export const metadata: Metadata = {
@@ -28,17 +22,17 @@ export const metadata: Metadata = {
     template: `%s — ${SITE.fullName}`,
   },
   description:
-    "A round-trip portfolio. Stamp your ticket, board the train, look at the work.",
+    "Walk around Aditya's room. Click things. Snoop. A point-and-click portfolio from Ajmer.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${display.variable} ${mono.variable} ${hand.variable} h-full antialiased`}
+      className={`${display.variable} ${pixel.variable} h-full`}
       suppressHydrationWarning
     >
-      <body className={`${mono.className} min-h-full bg-[#1a52d4]`} suppressHydrationWarning>
+      <body className={`${pixel.className} h-full`} suppressHydrationWarning>
         <SiteShell>{children}</SiteShell>
       </body>
     </html>

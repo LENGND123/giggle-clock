@@ -25,6 +25,7 @@
 *.pem
 /agent-tools
 /.video-frames
+/.tmp-video-frames
 
 # debug
 npm-debug.log*
