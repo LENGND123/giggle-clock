@@ -1,32 +1,24 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Syne } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 
-const syne = Syne({
-  variable: "--font-display",
+const outfit = Outfit({
+  variable: "--font-sans",
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
-});
-
-const plexMono = IBM_Plex_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "Cube Clock",
-  description:
-    "A tumbling white cube with a triangular hole. It is a clock, technically.",
+  title: "Giggle Clock",
+  description: "A dotted analog clock on yellow paper.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${syne.variable} ${plexMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full bg-[#0b0b0b]">{children}</body>
+    <html lang="en" className={`${outfit.variable} h-full antialiased`}>
+      <body className={`${outfit.className} min-h-full bg-[#F2E85A]`}>
+        {children}
+      </body>
     </html>
   );
 }

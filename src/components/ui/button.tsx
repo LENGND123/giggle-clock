@@ -3,19 +3,18 @@ import type { ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-full border text-[11px] font-medium tracking-[0.18em] uppercase transition-colors disabled:pointer-events-none disabled:opacity-40",
+  "inline-flex items-center justify-center rounded-full text-sm transition-colors disabled:pointer-events-none disabled:opacity-40",
   {
     variants: {
       variant: {
         ghost:
-          "border-transparent bg-transparent text-white/45 hover:text-white",
-        active: "border-white/15 bg-white/10 text-white",
-        outline:
-          "border-white/15 bg-transparent text-white/70 hover:border-white/40 hover:text-white",
+          "bg-[var(--pill)] px-3.5 py-1.5 text-[var(--ink)] shadow-[0_1px_0_rgba(0,0,0,0.05)] hover:brightness-105",
+        active: "bg-[var(--ink)] px-3.5 py-1.5 text-[var(--bg)]",
+        icon: "size-10 bg-white text-black shadow-[0_1px_2px_rgba(0,0,0,0.08)] hover:scale-[1.03]",
       },
       size: {
-        sm: "h-8 px-3",
-        md: "h-9 px-4",
+        sm: "",
+        md: "",
       },
     },
     defaultVariants: {

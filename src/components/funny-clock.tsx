@@ -1,108 +1,157 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { CubeScene } from "@/components/cube-scene";
+import { useCallback, useEffect, useState } from "react";
+import { AnalogFace } from "@/components/analog-face";
+import { DigitalFace } from "@/components/digital-face";
+import { PreferencesPanel } from "@/components/preferences-panel";
 import { Button } from "@/components/ui/button";
 import { useNow } from "@/hooks/use-now";
-import { CLOCK_MODES, modeLabel, type ClockMode } from "@/lib/clock-types";
-import { formatTime } from "@/lib/utils";
-
-function HexLoader() {
-  return (
-    <div
-      className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center bg-[#0b0b0b]"
-      aria-hidden
-    >
-      <div className="hex-loader" />
-    </div>
-  );
-}
+import { useTickSound } from "@/hooks/use-tick-sound";
+import {
+  themeById,
+  type FaceMode,
+  type RenderMode,
+  type SoundMode,
+  type ThemeId,
+} from "@/lib/clock-types";
 
 export function FunnyClock() {
   const now = useNow(40);
-  const [mode, setMode] = useState<ClockMode>("still");
-  const [hour12, setHour12] = useState(false);
-  const [flipNonce, setFlipNonce] = useState(0);
-  const [ready, setReady] = useState(false);
-  const [showChrome, setShowChrome] = useState(false);
+  const [face, setFace] = useState<FaceMode>("analog");
+  const [renderMode, setRenderMode] = useState<RenderMode>("halftone");
+  const [themeId, setThemeId] = useState<ThemeId>("sun");
+  const [sound, setSound] = useState<SoundMode>("system");
+  const [volume, setVolume] = useState(60);
+  const [panelOpen, setPanelOpen] = useState(true);
+  const [announced, setAnnounced] = useState(false);
+  const theme = themeById(themeId);
 
-  const time = formatTime(now, hour12);
+  useEffect(() => {
+    setAnnounced(true);
+  }, []);
 
-  const handleCubeClick = useCallback(() => {
-    setFlipNonce((value) => value + 1);
-    if (mode === "hypnotic") {
+  useTickSound(now, sound, volume);
+
+  const toggleFullscreen = useCallback(() => {
+    if (document.fullscreenElement) {
+      void document.exitFullscreen();
       return;
     }
-    setMode("still");
-  }, [mode]);
-
-  const handleReady = useCallback(() => {
-    setReady(true);
+    void document.documentElement.requestFullscreen();
   }, []);
 
   return (
     <div
-      className="relative h-dvh w-full overflow-hidden bg-[#0b0b0b] text-[#f4f1ea]"
-      onMouseMove={() => setShowChrome(true)}
-      onMouseLeave={() => setShowChrome(false)}
-      onTouchStart={() => setShowChrome(true)}
+      className="clock-shell relative h-dvh w-full overflow-hidden"
+      style={{
+        backgroundColor: theme.bg,
+        color: theme.ink,
+        ["--bg" as string]: theme.bg,
+        ["--ink" as string]: theme.ink,
+        ["--muted" as string]: theme.muted,
+        ["--pill" as string]: theme.pill,
+        ["--grid" as string]: theme.grid,
+      }}
     >
-      {!ready && <HexLoader />}
+      {announced && now ? (
+        <p className="sr-only" aria-live="polite">
+          {now.toLocaleTimeString()}
+        </p>
+      ) : null}
 
       <div className="absolute inset-0 z-10">
-        <CubeScene
-          mode={mode}
-          flipNonce={flipNonce}
-          onCubeClick={handleCubeClick}
-          onReady={handleReady}
-        />
+        {face === "analog" ? (
+          <AnalogFace
+            now={now}
+            ink={theme.ink}
+            hub={theme.hub}
+            mode={renderMode}
+          />
+        ) : (
+          <DigitalFace now={now} ink={theme.ink} />
+        )}
       </div>
 
-      <div
-        className={`pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between p-5 transition-opacity duration-300 sm:p-7 ${
-          showChrome ? "opacity-100" : "opacity-40 sm:opacity-0"
-        }`}
+      <Button
+        variant="icon"
+        className="absolute top-5 left-5 z-30 sm:top-6 sm:left-6"
+        aria-label={panelOpen ? "Preferences" : "Show preferences"}
+        onClick={() => setPanelOpen((value) => !value)}
       >
-        <p className="font-mono text-[10px] tracking-[0.34em] text-white/35 uppercase">
-          Cube Clock
-        </p>
-        <div className="pointer-events-auto flex items-center gap-1">
-          {CLOCK_MODES.map((item) => (
-            <Button
-              key={item}
-              variant={item === mode ? "active" : "ghost"}
-              onClick={() => setMode(item)}
-              aria-pressed={item === mode}
-            >
-              {modeLabel(item)}
-            </Button>
-          ))}
-          <Button
-            variant="outline"
-            className="ml-2"
-            onClick={() => setHour12((value) => !value)}
-            aria-label="Toggle 12-hour and 24-hour time"
-          >
-            {hour12 ? "12h" : "24h"}
-          </Button>
-        </div>
+        <ChatIcon />
+      </Button>
+
+      <div className="absolute top-5 right-5 z-30 flex gap-2 sm:top-6 sm:right-6">
+        <Button
+          variant="icon"
+          aria-label="Hide preferences"
+          onClick={() => setPanelOpen(false)}
+        >
+          <CloseIcon />
+        </Button>
+        <Button
+          variant="icon"
+          aria-label="Toggle fullscreen"
+          onClick={toggleFullscreen}
+        >
+          <ExpandIcon />
+        </Button>
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center pb-7 sm:pb-9">
-        <p className="flex items-baseline gap-2 font-display leading-none text-white/88">
-          <span className="text-3xl tabular-nums tracking-tight sm:text-4xl">
-            {time.hours}:{time.minutes}
-          </span>
-          <span className="font-mono text-base text-white/40 tabular-nums sm:text-lg">
-            {time.seconds}
-          </span>
-          {time.meridian ? (
-            <span className="font-mono text-[10px] tracking-[0.22em] text-white/35 uppercase">
-              {time.meridian}
-            </span>
-          ) : null}
-        </p>
-      </div>
+      <PreferencesPanel
+        open={panelOpen}
+        face={face}
+        renderMode={renderMode}
+        themeId={themeId}
+        sound={sound}
+        volume={volume}
+        onFaceChange={setFace}
+        onRenderModeChange={setRenderMode}
+        onThemeChange={setThemeId}
+        onSoundChange={setSound}
+        onVolumeChange={setVolume}
+        now={now}
+      />
     </div>
+  );
+}
+
+function ChatIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M5 18.5 4 22l4-1.6c1 .4 2.1.6 3.3.6 5 0 9-3.6 9-8s-4-8-9-8-9 3.6-9 8c0 1.7.6 3.3 1.7 4.6Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M6 6l12 12M18 6 6 18"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function ExpandIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M9 4H4v5M15 4h5v5M9 20H4v-5M20 15v5h-5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }

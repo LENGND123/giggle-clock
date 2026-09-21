@@ -56,3 +56,20 @@ export function formatDate(date: Date | null): string {
     day: "numeric",
   }).format(date);
 }
+
+export function giggleLine(date: Date): string {
+  const hour = date.getHours();
+  if (hour < 5) {
+    return "the dots are still up. you too?";
+  }
+  if (hour < 12) {
+    return "morning, counted out in specks.";
+  }
+  if (hour < 17) {
+    return "afternoon is just a slower second hand.";
+  }
+  if (hour < 21) {
+    return "evening. the paper keeps the time.";
+  }
+  return "night shift for a field of dots.";
+}
