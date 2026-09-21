@@ -1,6 +1,6 @@
-# Giggle Clock
+# Aditya Raj Singh
 
-A yellow dotted analog clock. Time is a field of beads.
+A round-trip portfolio. Stamp the ticket, board the train, get off at the work.
 
 ## Run it
 
@@ -11,9 +11,9 @@ pnpm dev
 
 Open [http://localhost:43147](http://localhost:43147).
 
-## Controls
+## Stops
 
-- **Analog / Digital** — face style
-- **Halftone / Beads** — how the marks are drawn
-- Color dots switch the paper
-- **Mute / System / Watch** — tick sounds
+- **home** — stamp a round-trip ticket
+- **work** — selected projects
+- **about** — bio, internships, outside work
+- **play** — doodle pad
